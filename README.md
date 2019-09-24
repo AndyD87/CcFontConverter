@@ -1,1 +1,1 @@
-Init git
+Use Qt to convert fonts into bitmuster for embedded software.
