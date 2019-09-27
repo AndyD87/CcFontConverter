@@ -13,22 +13,22 @@ CSign& CSignMap::operator[](size_t uiPos)
   return m_oSigns[static_cast<int>(uiPos)];
 }
 
-QString CSignMap::getSRectangleMap()
+QString CSignMap::getSRectangleMap(const QString& sVarName)
 {
   shrinkUpperAndLower();
   QString sOutput;
   QString sReturn = "";
   QString sStructs = "";
-  QString sMap = "SRectangle* Graphics_Sign_" + QString::number(m_uiSize) + "[] = {\r\n";
+  QString sMap = "SRectangle* " + sVarName + "[] = {\r\n";
   // for each letter do create a bitmap
   for(CSign& oSignMap : m_oSigns)
   {
     QString sSignNr = QString::number(oSignMap.getId());
-    sStructs += "SRectangle Graphics_Sign_" + QString::number(m_uiSize) + "_" + sSignNr + " = " + oSignMap.getSRectangle() + "\r\n";
-    sMap += "  &Graphics_Sign_" + QString::number(m_uiSize) + "_" + sSignNr + ",\r\n";
+    sStructs += "SRectangle " + sVarName + "_" + sSignNr + " = " + oSignMap.getSRectangle() + "\r\n";
+    sMap += "  &" + sVarName + "_" + sSignNr + ",\r\n";
   }// end for
 
-  sMap    += "};";
+  sMap    += "};\r\n\r\n";
   sReturn += sStructs;
   sReturn += "\r\n";
   sReturn += sMap;

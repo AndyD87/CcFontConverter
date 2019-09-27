@@ -3,6 +3,7 @@
 #include <QFontDialog>
 #include <QPushButton>
 #include <QPainter>
+#include <QFileDialog>
 #include <QImage>
 
 #include "CcBase.h"
@@ -20,9 +21,11 @@ CcFontConverter::CcFontConverter(QWidget *parent) :
   m_oFont("Arial", 12)
 {
   m_pUi->setupUi(this);
-  m_pUi->guiEditFont->setText(m_oFont.toString());
   connect(m_pUi->guiButtonFont, &QPushButton::clicked, this, &CcFontConverter::onFontClicked);
   connect(m_pUi->guiButtonGenerate, &QPushButton::clicked, this, &CcFontConverter::onGenerateClicked);
+  connect(m_pUi->guiButtonGenerateFiles, &QPushButton::clicked, this, &CcFontConverter::onGenerateFilesClicked);
+  checkFonts();
+  checkSizes();
 }
 
 CcFontConverter::~CcFontConverter()
@@ -33,9 +36,118 @@ CcFontConverter::~CcFontConverter()
 void CcFontConverter::onGenerateClicked(bool bChecked)
 {
   CCUNUSED(bChecked);
-  CSignMap oSignMap(static_cast<size_t>(m_oFont.pointSize()));
-  int uiWidth = m_oFont.pointSize()*2;
-  int uiHeight = m_oFont.pointSize()*2;
+  QList<uint32> oSizes = getSizes();
+  QList<QString> oFonts = getFonts();
+  m_pUi->guiEditSources->setPlainText("");
+  for(QString& sFamily : oFonts)
+  {
+    for(uint32 uiSize : oSizes)
+    {
+      generate(sFamily, uiSize, m_pUi->guiEditPrefix->text().trimmed());
+    }
+  }
+}
+
+void CcFontConverter::onGenerateFilesClicked(bool bChecked)
+{
+  CCUNUSED(bChecked);
+  QStringList oFileFilter;
+  oFileFilter.append("C-Files (*.c *.h)");
+  oFileFilter.append("CPP-Files (*.cpp *.h)");
+  QFileDialog oFileDialog;
+  oFileDialog.setFileMode(QFileDialog::AnyFile);
+  oFileDialog.setNameFilters(oFileFilter);
+  oFileDialog.setViewMode(QFileDialog::Detail);
+  if(oFileDialog.exec())
+  {
+    QFile oSourceFile;
+    QFile oHeaderFile;
+    QStringList oFileNames = oFileDialog.selectedFiles();
+    QString sNameFilter = oFileDialog.selectedNameFilter();
+    if(sNameFilter == oFileFilter[1])
+    {
+      if(oFileNames.size() == 1)
+      {
+        // Cpp Format
+        QString sFileName = oFileNames[0];
+        if(sFileName.endsWith(".h"))
+        {
+          oHeaderFile.setFileName(sFileName);
+          sFileName = sFileName.mid(0, sFileName.length() - 2);
+          sFileName += ".cpp";
+          oSourceFile.setFileName(sFileName);
+        }
+        else if(sFileName.endsWith(".cpp"))
+        {
+          oSourceFile.setFileName(sFileName);
+          sFileName = sFileName.mid(0, sFileName.length() - 4);
+          sFileName += ".h";
+          oHeaderFile.setFileName(sFileName);
+        }
+        else
+        {
+          oSourceFile.setFileName(sFileName + ".cpp");
+          oHeaderFile.setFileName(sFileName + ".h");
+        }
+      }
+    }
+    else
+    {
+      // C Format
+      if(oFileNames.size() == 1)
+      {
+        QString sFileName = oFileNames[0];
+        if(sFileName.endsWith(".h"))
+        {
+          oHeaderFile.setFileName(sFileName);
+          sFileName = sFileName.mid(0, sFileName.length() - 2);
+          sFileName += ".c";
+          oSourceFile.setFileName(sFileName);
+        }
+        else if(sFileName.endsWith(".c"))
+        {
+          oSourceFile.setFileName(sFileName);
+          sFileName = sFileName.mid(0, sFileName.length() - 2);
+          sFileName += ".h";
+          oHeaderFile.setFileName(sFileName);
+        }
+        else
+        {
+          oSourceFile.setFileName(sFileName + ".c");
+          oHeaderFile.setFileName(sFileName + ".h");
+        }
+      }
+    }
+
+    if(oHeaderFile.open(QIODevice::WriteOnly))
+    {
+      if(oSourceFile.open(QIODevice::WriteOnly))
+      {
+        QList<uint32> oSizes = getSizes();
+        QList<QString> oFonts = getFonts();
+        m_pUi->guiEditSources->setPlainText("");
+        for(QString& sFamily : oFonts)
+        {
+          for(uint32 uiSize : oSizes)
+          {
+            generate(sFamily, uiSize, m_pUi->guiEditPrefix->text().trimmed());
+          }
+        }
+        QString sText = m_pUi->guiEditSources->toPlainText();
+        oSourceFile.write(sText.toUtf8());
+        oSourceFile.close();
+      }
+      oHeaderFile.close();
+    }
+  }
+}
+
+void CcFontConverter::generate(const QString& sFamily, uint32 uiSize, const QString& sPrefix)
+{
+  QFont oFont(sFamily, static_cast<int>(uiSize));
+  CSignMap oSignMap(static_cast<size_t>(oFont.pointSize()));
+  int uiWidth = oFont.pointSize()*2;
+  int uiHeight = oFont.pointSize()*2;
   for(char i=0; i >= 0; i++)
   {
     QRect oPictureRect(0,0,uiWidth, uiHeight);
@@ -45,7 +157,7 @@ void CcFontConverter::onGenerateClicked(bool bChecked)
     pPainter->setPen(Qt::white);
     pPainter->drawRect(oPictureRect);
     pPainter->setPen(Qt::black);
-    pPainter->setFont(m_oFont);
+    pPainter->setFont(oFont);
     try
     {
       QString sString(i);
@@ -76,7 +188,12 @@ void CcFontConverter::onGenerateClicked(bool bChecked)
       }
     }
   }
-  m_pUi->guiEditSources->setText(oSignMap.getSRectangleMap());
+  QString sVarName = sPrefix;
+  if(sVarName.length()) sVarName += "_";
+  sVarName += sFamily + "_";
+  sVarName.replace(" ", "");
+  sVarName += QString::number(uiSize);
+  m_pUi->guiEditSources->insertPlainText(m_pUi->guiEditSources->toPlainText() + oSignMap.getSRectangleMap(sVarName));
 }
 
 void CcFontConverter::onFontClicked(bool bChecked)
@@ -84,7 +201,8 @@ void CcFontConverter::onFontClicked(bool bChecked)
   bool bOk;
   CCUNUSED(bChecked);
   m_oFont = QFontDialog::getFont(&bOk, m_oFont, this);
-  m_pUi->guiEditFont->setText(m_oFont.toString());
+  checkFonts();
+  checkSizes();
 }
 
 bool CcFontConverter::isUnprintable(char iChar)
@@ -99,4 +217,69 @@ bool CcFontConverter::isUnprintable(char iChar)
     }
   }
   return  bUnprintable;
+}
+
+QList<QString> CcFontConverter::getFonts()
+{
+  QList<QString> oFonts;
+  QString sFonts = m_pUi->guiEditFonts->text();
+  QStringList sFontStrings = sFonts.split(",");
+  for(QString& sFont : sFontStrings)
+  {
+    sFont = sFont.trimmed();
+    if(sFont.length())
+      oFonts.append(sFont);
+  }
+  return oFonts;
+}
+
+void CcFontConverter::checkFonts()
+{
+  QString sFont = m_oFont.family();
+  QList<QString> oFonts = getFonts();
+  if(!oFonts.contains(sFont))
+  {
+    if(oFonts.size() == 0)
+    {
+      m_pUi->guiEditFonts->setText(sFont);
+    }
+    else
+    {
+      m_pUi->guiEditFonts->setText(m_pUi->guiEditFonts->text() + ", " + sFont);
+    }
+  }
+}
+
+QList<uint32> CcFontConverter::getSizes()
+{
+  QList<uint32> oSizes;
+  QString sSizes = m_pUi->guiEditSizes->text();
+  QStringList oSizeStrings = sSizes.split(",");
+  for(QString& sSize : oSizeStrings)
+  {
+    bool bOk;
+    uint32 uiSize = sSize.trimmed().toUInt(&bOk);
+    if(bOk)
+    {
+      oSizes.append(uiSize);
+    }
+  }
+  return oSizes;
+}
+
+void CcFontConverter::checkSizes()
+{
+  uint32 uiFontSize = static_cast<uint32>(m_oFont.pointSize());
+  QList<uint32> oSizes = getSizes();
+  if(!oSizes.contains(uiFontSize))
+  {
+    if(oSizes.size() == 0)
+    {
+      m_pUi->guiEditSizes->setText(QString::number(uiFontSize));
+    }
+    else
+    {
+      m_pUi->guiEditSizes->setText(m_pUi->guiEditSizes->text() + ", " + QString::number(uiFontSize));
+    }
+  }
 }

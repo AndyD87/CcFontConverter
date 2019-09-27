@@ -13,7 +13,7 @@ public:
   CSign& operator[](size_t uiPos);
   size_t getSize() const
     { return m_uiSize; }
-  QString getSRectangleMap();
+  QString getSRectangleMap(const QString& sVarName);
   void shrinkUpperAndLower();
 private:
   size_t        m_uiSize;

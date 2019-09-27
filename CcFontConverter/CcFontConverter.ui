@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>391</width>
-    <height>501</height>
+    <height>496</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,14 +20,14 @@
       <x>10</x>
       <y>10</y>
       <width>75</width>
-      <height>23</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Select Font</string>
+     <string>Add Font</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="guiEditFont">
+   <widget class="QLineEdit" name="guiEditFonts">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -60,21 +60,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTextEdit" name="guiEditSources">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>371</width>
-      <height>341</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="guiLabelSource">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>100</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -86,14 +76,82 @@
    <widget class="QPushButton" name="guiButtonGenerate">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>70</y>
-      <width>75</width>
+      <x>220</x>
+      <y>100</y>
+      <width>71</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Generate</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="guiEditSources">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>371</width>
+      <height>311</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="guiEditPrefix">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>70</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="guiLabelPrefix">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Prefix</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="guiLabelName">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>70</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>[[Prefix]_](Font)_(Size)</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="guiButtonGenerateFiles">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>100</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Generate Files</string>
     </property>
    </widget>
   </widget>

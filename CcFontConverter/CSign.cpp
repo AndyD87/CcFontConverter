@@ -44,19 +44,20 @@ QString CSign::getSRectangle() const
       uint8 uiCurrentByte = 0;
       for(size_t iX=0; iX < m_uiWidth; iX++)
       {
-        if(getPixel(iY, iX))
+        if(getPixel(iX, iY))
         {
           uiCurrentByte |= 0x1 << (iX%8);
         }
         if(iX % 8 == 8-1)
         {
           sOutput += "0x" + QString::number(uiCurrentByte, 16);
-          if (iX+1 < m_uiWidth)
+          if (iX != m_uiWidth-1)
           {
             sOutput += ",";
           }
+          uiCurrentByte = 0;
         }
-        else if(iX < m_uiWidth-1)
+        else if(iX == m_uiWidth-1)
         {
           sOutput += "0x" + QString::number(uiCurrentByte, 16);
         }
@@ -73,8 +74,8 @@ QString CSign::getSRectangle() const
 
 uint32 CSign::getFirstUpper()
 {
-  uint32 iPos = UINT32_MAX;
-  for (uint32 iY = 0; iY < m_uiHeight && iPos == UINT32_MAX; iY++)
+  uint32 iPos = m_uiHeight-1;
+  for (uint32 iY = 0; iY < m_uiHeight && iPos == m_uiHeight-1; iY++)
   {
     for (uint32 iX = 0; iX < m_uiWidth; iX++)
     {
@@ -90,8 +91,8 @@ uint32 CSign::getFirstUpper()
 
 uint32 CSign::getLastLower()
 {
-  uint32 iPos = UINT32_MAX;
-  for (uint32 iY = m_uiHeight; iY > 0 && iPos == UINT32_MAX; iY--)
+  uint32 iPos = 0;
+  for (uint32 iY = m_uiHeight; iY > 0 && iPos == 0; iY--)
   {
     for (uint32 iX = 0; iX < m_uiWidth; iX++)
     {
@@ -107,8 +108,8 @@ uint32 CSign::getLastLower()
 
 uint32 CSign::getFirstLeft()
 {
-  uint32 iPos = UINT32_MAX;
-  for (uint32 iY = 0; iY < m_uiHeight && iPos == UINT32_MAX; iY++)
+  uint32 iPos = m_uiWidth-1;
+  for (uint32 iY = 0; iY < m_uiHeight; iY++)
   {
     for (uint32 iX = 0; iX < m_uiWidth; iX++)
     {
@@ -125,8 +126,8 @@ uint32 CSign::getFirstLeft()
 
 uint32 CSign::getLastRight()
 {
-  uint32 iPos = UINT32_MAX;
-  for (uint32 iY = 0; iY < m_uiHeight && iPos == UINT32_MAX; iY++)
+  uint32 iPos = 0;
+  for (uint32 iY = 0; iY < m_uiHeight; iY++)
   {
     for (uint32 iX = 0; iX < m_uiWidth; iX++)
     {
@@ -134,7 +135,6 @@ uint32 CSign::getLastRight()
          iX > iPos)
       {
         iPos = iX;
-        break;
       }
     }
   }
@@ -191,7 +191,7 @@ void CSign::cutColumns(uint32 uiBegin, uint32 uiEnd)
 
 void CSign::cutColumns()
 {
-  cutColumns(getFirstLeft(), getLastLower());
+  cutColumns(getFirstLeft(), getLastRight());
 }
 
 uint32 CSign::getBytesFromWidth(uint32 iWidth)
