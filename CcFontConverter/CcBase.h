@@ -94,7 +94,7 @@
     typedef __uint16_t          uint16; //!< define global uint16 for bit-save-types
     typedef uint32_t            uint32; //!< define global uint32 for bit-save-types
     typedef __uint64_t          uint64; //!< define global uint64 for bit-save-types
-    typedef uint8_t             uint8;  //!< define global uint8 for bit-save-types
+    typedef unsigned char             uint8;  //!< define global uint8 for bit-save-types
     typedef __int16_t           int16;  //!< define global int16 for bit-save-types
     typedef int32_t             int32;  //!< define global int32 for bit-save-types
     typedef __int64_t           int64;  //!< define global int64 for bit-save-types

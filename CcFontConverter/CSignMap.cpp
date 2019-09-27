@@ -1,6 +1,7 @@
 #include "CSignMap.h"
 
-CSignMap::CSignMap(size_t uiSize) :
+CSignMap::CSignMap(const QString& sVarName, size_t uiSize):
+  m_sVarName(sVarName),
   m_uiSize(uiSize)
 {
   m_oSigns.reserve(static_cast<int>(uiSize));
@@ -13,26 +14,34 @@ CSign& CSignMap::operator[](size_t uiPos)
   return m_oSigns[static_cast<int>(uiPos)];
 }
 
-QString CSignMap::getSRectangleMap(const QString& sVarName)
+QString CSignMap::getSFontRectangleMap()
 {
   shrinkUpperAndLower();
   QString sOutput;
   QString sReturn = "";
   QString sStructs = "";
-  QString sMap = "SRectangle* " + sVarName + "[] = {\r\n";
+  QString sMap = "SFontRectangle* " + m_sVarName + "[] = {\n";
   // for each letter do create a bitmap
   for(CSign& oSignMap : m_oSigns)
   {
     QString sSignNr = QString::number(oSignMap.getId());
-    sStructs += "SRectangle " + sVarName + "_" + sSignNr + " = " + oSignMap.getSRectangle() + "\r\n";
-    sMap += "  &" + sVarName + "_" + sSignNr + ",\r\n";
+    sStructs += "SFontRectangle " + m_sVarName + "_" + sSignNr + " = " + oSignMap.getSFontRectangle() + "\n";
+    sMap += "  &" + m_sVarName + "_" + sSignNr + ",\n";
   }// end for
 
-  sMap    += "};\r\n\r\n";
+  sMap    += "};\n\n";
+  sMap = "size_t " + m_sVarName + "_Size = sizeof("+m_sVarName+")/sizeof("+m_sVarName+"[0]);\n";
   sReturn += sStructs;
-  sReturn += "\r\n";
+  sReturn += "\n";
   sReturn += sMap;
   return sReturn;
+}
+
+QString CSignMap::getSFontRectangleHeader()
+{
+  QString sOutput = "extern SFontRectangle* " + m_sVarName + "[];\n";
+  sOutput = "extern size_t " + m_sVarName + "_Size;\n\n";
+  return sOutput;
 }
 
 void CSignMap::shrinkUpperAndLower()

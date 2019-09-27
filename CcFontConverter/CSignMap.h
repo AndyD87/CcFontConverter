@@ -8,14 +8,16 @@
 class CSignMap
 {
 public:
-  CSignMap(size_t uiSize);
+  CSignMap(const QString& sVarname, size_t uiSize);
 
   CSign& operator[](size_t uiPos);
-  size_t getSize() const
+  size_t size() const
     { return m_uiSize; }
-  QString getSRectangleMap(const QString& sVarName);
+  QString getSFontRectangleMap();
+  QString getSFontRectangleHeader();
   void shrinkUpperAndLower();
 private:
+  QString       m_sVarName;
   size_t        m_uiSize;
   QList<CSign>  m_oSigns;
 };

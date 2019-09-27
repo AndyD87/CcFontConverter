@@ -16,7 +16,18 @@ CSign::~CSign()
   CCDELETEARR(m_pData);
 }
 
-void CSign::SetPixel(uint32 uiX, uint32 uiY, uint8 uiAlpha)
+CSign& CSign::operator=(const CSign& oToCopy)
+{
+  if(&oToCopy != this)
+  {
+    clear();
+    init(oToCopy.getId(), oToCopy.getWidth(), oToCopy.getHeight());
+    memcpy(m_pData, oToCopy.m_pData, static_cast<uint64>(m_uiWidth) * m_uiHeight);
+  }
+  return *this;
+}
+
+void CSign::setPixel(uint32 uiX, uint32 uiY, uint8 uiAlpha)
 {
   if(uiX < m_uiWidth && uiY < m_uiHeight)
   {
@@ -34,7 +45,7 @@ void CSign::init(uint32 uiId, uint32 uiWidth, uint32 uiHeight)
   memset(m_pData, 0, sizeof(static_cast<uint64>(m_uiWidth) * m_uiHeight));
 }
 
-QString CSign::getSRectangle() const
+QString CSign::getSFontRectangle() const
 {
   QString sOutput = "{" + QString::number(m_uiWidth) + "," + QString::number(m_uiHeight) + ",{";
   if(m_uiWidth > 0)
@@ -202,4 +213,12 @@ uint32 CSign::getBytesFromWidth(uint32 iWidth)
     iRet++;
   }
   return iRet;
+}
+
+void CSign::clear()
+{
+  CCDELETEARR(m_pData);
+  m_uiId = 0;
+  m_uiWidth = 0;
+  m_uiHeight = 0;
 }

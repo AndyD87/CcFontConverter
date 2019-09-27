@@ -10,10 +10,12 @@ public:
   CSign() = default;
   CSign(uint32 uiId, uint32 uiWidth, uint32 uiHeight);
   ~CSign();
-  void SetPixel(uint32 uiX, uint32 uiY, uint8 uiAlpha);
 
+  CSign& operator=(const CSign& oToCopy);
+
+  void setPixel(uint32 uiX, uint32 uiY, uint8 uiAlpha);
   void init(uint32 uiId, uint32 uiWidth, uint32 uiHeight);
-  QString getSRectangle() const;
+  QString getSFontRectangle() const;
   uint8& getPixel(size_t uiX, size_t uiY) const
     { return m_pData[uiX + (uiY * m_uiWidth)]; }
   uint32 getId() const
@@ -33,6 +35,7 @@ public:
 
 private:
   static uint32 getBytesFromWidth(uint32 iWidth);
+  void clear();
 private:
   uint32 m_uiId     = 0;
   uint32 m_uiWidth  = 0;

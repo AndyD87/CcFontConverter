@@ -28,13 +28,17 @@ SOURCES += \
     main.cpp \
     CcFontConverter.cpp \
     CSign.cpp \
-    CSignMap.cpp
+    CSignMap.cpp \
+    CFontSourceFile.cpp \
+    CFontExample.c
 
 HEADERS += \
     CcFontConverter.h \
     CSign.h \
     CSignMap.h \
-    CcBase.h
+    CcBase.h \
+    CFontSourceFile.h \
+    CFontExample.h
 
 FORMS += \
     CcFontConverter.ui

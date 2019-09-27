@@ -8,6 +8,7 @@
 
 #include "CcBase.h"
 #include "CSignMap.h"
+#include "CFontSourceFile.h"
 
 const char CcFontConverter::c_pUnprintable[] =
 {
@@ -50,6 +51,7 @@ void CcFontConverter::onGenerateClicked(bool bChecked)
 
 void CcFontConverter::onGenerateFilesClicked(bool bChecked)
 {
+  statusReset();
   CCUNUSED(bChecked);
   QStringList oFileFilter;
   oFileFilter.append("C-Files (*.c *.h)");
@@ -60,8 +62,8 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
   oFileDialog.setViewMode(QFileDialog::Detail);
   if(oFileDialog.exec())
   {
-    QFile oSourceFile;
-    QFile oHeaderFile;
+    QString sSourceFilePath;
+    QString sHeaderFilePath;
     QStringList oFileNames = oFileDialog.selectedFiles();
     QString sNameFilter = oFileDialog.selectedNameFilter();
     if(sNameFilter == oFileFilter[1])
@@ -72,22 +74,20 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
         QString sFileName = oFileNames[0];
         if(sFileName.endsWith(".h"))
         {
-          oHeaderFile.setFileName(sFileName);
-          sFileName = sFileName.mid(0, sFileName.length() - 2);
-          sFileName += ".cpp";
-          oSourceFile.setFileName(sFileName);
+          sHeaderFilePath = sFileName;
+          sSourceFilePath = sFileName.mid(0, sFileName.length() - 2);
+          sSourceFilePath += ".cpp";
         }
         else if(sFileName.endsWith(".cpp"))
         {
-          oSourceFile.setFileName(sFileName);
-          sFileName = sFileName.mid(0, sFileName.length() - 4);
-          sFileName += ".h";
-          oHeaderFile.setFileName(sFileName);
+          sSourceFilePath = sFileName;
+          sHeaderFilePath = sFileName.mid(0, sFileName.length() - 4);
+          sHeaderFilePath += ".h";
         }
         else
         {
-          oSourceFile.setFileName(sFileName + ".cpp");
-          oHeaderFile.setFileName(sFileName + ".h");
+          sSourceFilePath = sFileName + ".cpp";
+          sHeaderFilePath = sFileName + ".h";
         }
       }
     }
@@ -99,53 +99,60 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
         QString sFileName = oFileNames[0];
         if(sFileName.endsWith(".h"))
         {
-          oHeaderFile.setFileName(sFileName);
-          sFileName = sFileName.mid(0, sFileName.length() - 2);
-          sFileName += ".c";
-          oSourceFile.setFileName(sFileName);
+          sHeaderFilePath = sFileName;
+          sSourceFilePath = sFileName.mid(0, sFileName.length() - 2);
+          sSourceFilePath += ".c";
         }
         else if(sFileName.endsWith(".c"))
         {
-          oSourceFile.setFileName(sFileName);
-          sFileName = sFileName.mid(0, sFileName.length() - 2);
-          sFileName += ".h";
-          oHeaderFile.setFileName(sFileName);
+          sSourceFilePath = sFileName;
+          sHeaderFilePath = sFileName.mid(0, sFileName.length() - 2);
+          sHeaderFilePath += ".h";
         }
         else
         {
-          oSourceFile.setFileName(sFileName + ".c");
-          oHeaderFile.setFileName(sFileName + ".h");
+          sSourceFilePath = sFileName + ".c";
+          sHeaderFilePath = sFileName + ".h";
         }
       }
     }
 
-    if(oHeaderFile.open(QIODevice::WriteOnly))
+    CFontSourceFile oFontFile;
+    oFontFile.setHeaderFilePath(sHeaderFilePath);
+    oFontFile.setSourceFilePath(sSourceFilePath);
+    if(oFontFile.open())
     {
-      if(oSourceFile.open(QIODevice::WriteOnly))
+      statusWriteLine("Sourcefiles found and opened");
+      QList<uint32> oSizes = getSizes();
+      QList<QString> oFonts = getFonts();
+      for(QString& sFamily : oFonts)
       {
-        QList<uint32> oSizes = getSizes();
-        QList<QString> oFonts = getFonts();
-        m_pUi->guiEditSources->setPlainText("");
-        for(QString& sFamily : oFonts)
+        for(uint32 uiSize : oSizes)
         {
-          for(uint32 uiSize : oSizes)
-          {
-            generate(sFamily, uiSize, m_pUi->guiEditPrefix->text().trimmed());
-          }
+          statusWriteLine(sFamily + " " + QString::number(uiSize) + " created");
+          oFontFile.addSignMap(generateSignMap(sFamily, uiSize, m_pUi->guiEditPrefix->text().trimmed()));
         }
-        QString sText = m_pUi->guiEditSources->toPlainText();
-        oSourceFile.write(sText.toUtf8());
-        oSourceFile.close();
       }
-      oHeaderFile.close();
+      statusWriteLine("Write files");
+      oFontFile.writeFiles();
+      oFontFile.close();
+    }
+    else
+    {
+      statusWriteLine("Sourcefiles could not be opened");
     }
   }
 }
 
-void CcFontConverter::generate(const QString& sFamily, uint32 uiSize, const QString& sPrefix)
+CSignMap CcFontConverter::generateSignMap(const QString& sFamily, uint32 uiSize, const QString& sPrefix)
 {
   QFont oFont(sFamily, static_cast<int>(uiSize));
-  CSignMap oSignMap(static_cast<size_t>(oFont.pointSize()));
+  QString sVarName = sPrefix;
+  if(sVarName.length()) sVarName += "_";
+  sVarName += sFamily + "_";
+  sVarName.replace(" ", "");
+  sVarName += QString::number(uiSize);
+  CSignMap oSignMap(sVarName, static_cast<size_t>(oFont.pointSize()));
   int uiWidth = oFont.pointSize()*2;
   int uiHeight = oFont.pointSize()*2;
   for(char i=0; i >= 0; i++)
@@ -181,19 +188,20 @@ void CcFontConverter::generate(const QString& sFamily, uint32 uiSize, const QStr
       for(uint32 x=0; x < static_cast<uint32>(uiWidth); x++)
       {
         QRgb oColor = oPicture.pixel(static_cast<int>(x), static_cast<int>(y));
-        oSignMap[static_cast<size_t>(i)].SetPixel(
+        oSignMap[static_cast<size_t>(i)].setPixel(
               x,
               y,
               static_cast<uint8>(~(oColor&0xff)));
       }
     }
   }
-  QString sVarName = sPrefix;
-  if(sVarName.length()) sVarName += "_";
-  sVarName += sFamily + "_";
-  sVarName.replace(" ", "");
-  sVarName += QString::number(uiSize);
-  m_pUi->guiEditSources->insertPlainText(m_pUi->guiEditSources->toPlainText() + oSignMap.getSRectangleMap(sVarName));
+  return oSignMap;
+}
+
+void CcFontConverter::generate(const QString& sFamily, uint32 uiSize, const QString& sPrefix)
+{
+  CSignMap oSignMap = generateSignMap(sFamily, uiSize, sPrefix);
+  m_pUi->guiEditSources->appendPlainText(oSignMap.getSFontRectangleMap());
 }
 
 void CcFontConverter::onFontClicked(bool bChecked)
@@ -282,4 +290,14 @@ void CcFontConverter::checkSizes()
       m_pUi->guiEditSizes->setText(m_pUi->guiEditSizes->text() + ", " + QString::number(uiFontSize));
     }
   }
+}
+
+void CcFontConverter::statusReset()
+{
+  m_pUi->guiEditSources->setPlainText("");
+}
+
+void CcFontConverter::statusWriteLine(const QString& sStatus)
+{
+  m_pUi->guiEditSources->appendPlainText(sStatus +"\n");
 }

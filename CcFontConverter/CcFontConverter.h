@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include "CcBase.h"
 
+class CSignMap;
 class QString;
 class QStringList;
 
@@ -19,6 +20,7 @@ class CcFontConverter : public QMainWindow
 public:
   explicit CcFontConverter(QWidget *parent = nullptr);
   ~CcFontConverter();
+  CSignMap generateSignMap(const QString& sFamily, uint32 uiSize, const QString& sPrefix);
   void generate(const QString& sFamily, uint32 uiSize, const QString& sPrefix);
 
 private slots:
@@ -32,6 +34,9 @@ private:
   void checkFonts();
   QList<uint32> getSizes();
   void checkSizes();
+
+  void statusReset();
+  void statusWriteLine(const QString& sStatus);
 private:
   Ui::CcFontConverter *m_pUi;
   QFont m_oFont;
