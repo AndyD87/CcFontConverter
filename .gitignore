@@ -1,0 +1,21 @@
+#Generated Subfolders
+/Solution*
+/Output
+/Debug
+/Release
+/Doku/Doxygen/html
+/Toolchain
+/Cache
+/Documents/Doxygen/config.txt
+/Tools/CcOSTools
+build*
+*.pro.user
+sdkconfig
+CMakeLists.txt.user*
+QtCreatorDeployment.txt
+
+# Temporary download status file
+*.progress
+
+# Generated version files
+#endif /*.rc
