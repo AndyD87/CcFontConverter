@@ -13,9 +13,10 @@ public:
   CSign& operator[](size_t uiPos);
   size_t size() const
     { return m_uiSize; }
-  QString getSFontRectangleMap();
+  QString getSFontRectangleMap(bool bCppMode);
   QString getSFontRectangleHeader();
   void shrinkUpperAndLower();
+  void updateRectangleSizes(QList<int> &oSizesList);
 private:
   QString       m_sVarName;
   size_t        m_uiSize;

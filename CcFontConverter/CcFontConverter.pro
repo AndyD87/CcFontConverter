@@ -30,7 +30,8 @@ SOURCES += \
     CSign.cpp \
     CSignMap.cpp \
     CFontSourceFile.cpp \
-    CFontExample.c
+    CFontExample.c \
+    CFontExampleCpp.cpp
 
 HEADERS += \
     CcFontConverter.h \
@@ -38,7 +39,8 @@ HEADERS += \
     CSignMap.h \
     CcBase.h \
     CFontSourceFile.h \
-    CFontExample.h
+    CFontExample.h \
+    CFontExampleCpp.h
 
 FORMS += \
     CcFontConverter.ui
@@ -47,3 +49,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    Resources/fonts.qrc

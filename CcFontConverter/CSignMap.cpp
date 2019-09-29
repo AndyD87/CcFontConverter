@@ -1,3 +1,4 @@
+#include <QList>
 #include "CSignMap.h"
 
 CSignMap::CSignMap(const QString& sVarName, size_t uiSize):
@@ -14,10 +15,8 @@ CSign& CSignMap::operator[](size_t uiPos)
   return m_oSigns[static_cast<int>(uiPos)];
 }
 
-QString CSignMap::getSFontRectangleMap()
+QString CSignMap::getSFontRectangleMap(bool bCppMode)
 {
-  shrinkUpperAndLower();
-  QString sOutput;
   QString sReturn = "";
   QString sStructs = "";
   QString sMap = "SFontRectangle* " + m_sVarName + "[] = {\n";
@@ -25,12 +24,22 @@ QString CSignMap::getSFontRectangleMap()
   for(CSign& oSignMap : m_oSigns)
   {
     QString sSignNr = QString::number(oSignMap.getId());
-    sStructs += "SFontRectangle " + m_sVarName + "_" + sSignNr + " = " + oSignMap.getSFontRectangle() + "\n";
-    sMap += "  &" + m_sVarName + "_" + sSignNr + ",\n";
+    sStructs += "SFontRectangle_"+
+                QString::number(oSignMap.getBytesWidth() * oSignMap.getHeight())+" " +
+                m_sVarName + "_" + sSignNr + " = " +
+                oSignMap.getSFontRectangle() + "\n";
+    if(bCppMode)
+    {
+      sMap += "  reinterpret_cast<SFontRectangle*>(&" + m_sVarName + "_" + sSignNr + "),\n";
+    }
+    else
+    {
+      sMap += "  (SFontRectangle*)&" + m_sVarName + "_" + sSignNr + ",\n";
+    }
   }// end for
 
   sMap    += "};\n\n";
-  sMap = "size_t " + m_sVarName + "_Size = sizeof("+m_sVarName+")/sizeof("+m_sVarName+"[0]);\n";
+  sMap    += "size_t " + m_sVarName + "_Size = sizeof("+m_sVarName+")/sizeof("+m_sVarName+"[0]);\n";
   sReturn += sStructs;
   sReturn += "\n";
   sReturn += sMap;
@@ -75,6 +84,17 @@ void CSignMap::shrinkUpperAndLower()
     else
     {
       oSignMap.cutColumns();
+    }
+  }
+}
+
+void CSignMap::updateRectangleSizes(QList<int>& oSizesList)
+{
+  for(CSign& rSign : m_oSigns)
+  {
+    if(!oSizesList.contains(rSign.getBytesWidth() * rSign.getHeight()))
+    {
+      oSizesList.append(rSign.getBytesWidth() * rSign.getHeight());
     }
   }
 }

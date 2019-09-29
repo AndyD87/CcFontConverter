@@ -27,10 +27,12 @@ private slots:
   void onFontClicked(bool bChecked);
   void onGenerateClicked(bool bChecked);
   void onGenerateFilesClicked(bool bChecked);
+  void onAddFontFileClicked(bool bChecked);
 
 private:
   static bool isUnprintable(char iChar);
   QList<QString> getFonts();
+  void addFont(const QString& sFont);
   void checkFonts();
   QList<uint32> getSizes();
   void checkSizes();

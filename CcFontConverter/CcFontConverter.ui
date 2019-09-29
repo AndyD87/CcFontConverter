@@ -32,7 +32,7 @@
      <rect>
       <x>90</x>
       <y>10</y>
-      <width>291</width>
+      <width>271</width>
       <height>20</height>
      </rect>
     </property>
@@ -55,7 +55,7 @@
      <rect>
       <x>90</x>
       <y>40</y>
-      <width>291</width>
+      <width>271</width>
       <height>20</height>
      </rect>
     </property>
@@ -154,6 +154,45 @@
      <string>Generate Files</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="guiButtonFontFile">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>100</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add Font File</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="guiButtonFontClean">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>10</y>
+      <width>24</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="guiButtonSizeClean">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>40</y>
+      <width>24</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -161,7 +200,7 @@
      <x>0</x>
      <y>0</y>
      <width>391</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

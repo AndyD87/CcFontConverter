@@ -4,7 +4,11 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QFileDialog>
+#include <QFile>
+#include <QFontDatabase>
 #include <QImage>
+#include <QDebug>
+#include <QDirIterator>
 
 #include "CcBase.h"
 #include "CSignMap.h"
@@ -18,13 +22,27 @@ const size_t CcFontConverter::c_uiUnprintableSize = sizeof(CcFontConverter::c_pU
 
 CcFontConverter::CcFontConverter(QWidget *parent) :
   QMainWindow(parent),
-  m_pUi(new Ui::CcFontConverter),
-  m_oFont("Arial", 12)
+  m_pUi(new Ui::CcFontConverter)
 {
   m_pUi->setupUi(this);
+  QDirIterator oDirIterator(":", QDirIterator::Subdirectories);
+  while (oDirIterator.hasNext())
+  {
+      qDebug() << oDirIterator.next();
+  }
+  int iFontNumber = QFontDatabase::addApplicationFont(":/Fonts/BitstreamVeraSans/Vera.ttf");
+  if(iFontNumber >= 0)
+  {
+    QStringList font_families = QFontDatabase::applicationFontFamilies(iFontNumber);
+    addFont(font_families[0]);
+    m_oFont.setFamily(font_families[0]);
+  }
   connect(m_pUi->guiButtonFont, &QPushButton::clicked, this, &CcFontConverter::onFontClicked);
   connect(m_pUi->guiButtonGenerate, &QPushButton::clicked, this, &CcFontConverter::onGenerateClicked);
   connect(m_pUi->guiButtonGenerateFiles, &QPushButton::clicked, this, &CcFontConverter::onGenerateFilesClicked);
+  connect(m_pUi->guiButtonFontFile, &QPushButton::clicked, this, &CcFontConverter::onAddFontFileClicked);
+  connect(m_pUi->guiButtonFontClean, &QPushButton::clicked, m_pUi->guiEditFonts, &QLineEdit::clear);
+  connect(m_pUi->guiButtonSizeClean, &QPushButton::clicked, m_pUi->guiEditSizes, &QLineEdit::clear);
   checkFonts();
   checkSizes();
 }
@@ -53,6 +71,7 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
 {
   statusReset();
   CCUNUSED(bChecked);
+  CFontSourceFile oFontFile;
   QStringList oFileFilter;
   oFileFilter.append("C-Files (*.c *.h)");
   oFileFilter.append("CPP-Files (*.cpp *.h)");
@@ -68,6 +87,7 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
     QString sNameFilter = oFileDialog.selectedNameFilter();
     if(sNameFilter == oFileFilter[1])
     {
+      oFontFile.setCppMode(true);
       if(oFileNames.size() == 1)
       {
         // Cpp Format
@@ -94,6 +114,7 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
     else
     {
       // C Format
+      oFontFile.setCppMode(false);
       if(oFileNames.size() == 1)
       {
         QString sFileName = oFileNames[0];
@@ -117,7 +138,6 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
       }
     }
 
-    CFontSourceFile oFontFile;
     oFontFile.setHeaderFilePath(sHeaderFilePath);
     oFontFile.setSourceFilePath(sSourceFilePath);
     if(oFontFile.open())
@@ -136,6 +156,7 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
       statusWriteLine("Write files");
       oFontFile.writeFiles();
       oFontFile.close();
+      statusWriteLine("Write files done");
     }
     else
     {
@@ -144,12 +165,34 @@ void CcFontConverter::onGenerateFilesClicked(bool bChecked)
   }
 }
 
+void CcFontConverter::onAddFontFileClicked(bool bChecked)
+{
+  CCUNUSED(bChecked);
+  QStringList oFileFilter;
+  oFileFilter.append("Font-Files (*.ttf)");
+  QFileDialog oFileDialog;
+  oFileDialog.setFileMode(QFileDialog::AnyFile);
+  oFileDialog.setNameFilters(oFileFilter);
+  oFileDialog.setViewMode(QFileDialog::Detail);
+  if(oFileDialog.exec())
+  {
+    QString sFilePath = oFileDialog.selectedFiles()[0];
+    int iFontNumber = QFontDatabase::addApplicationFont(sFilePath);
+    if(iFontNumber >= 0)
+    {
+      QStringList font_families = QFontDatabase::applicationFontFamilies(iFontNumber);
+      addFont(font_families[0]);
+    }
+  }
+}
+
 CSignMap CcFontConverter::generateSignMap(const QString& sFamily, uint32 uiSize, const QString& sPrefix)
 {
   QFont oFont(sFamily, static_cast<int>(uiSize));
+  QString sFamilyName = oFont.family();
   QString sVarName = sPrefix;
   if(sVarName.length()) sVarName += "_";
-  sVarName += sFamily + "_";
+  sVarName += sFamilyName + "_";
   sVarName.replace(" ", "");
   sVarName += QString::number(uiSize);
   CSignMap oSignMap(sVarName, static_cast<size_t>(oFont.pointSize()));
@@ -201,7 +244,8 @@ CSignMap CcFontConverter::generateSignMap(const QString& sFamily, uint32 uiSize,
 void CcFontConverter::generate(const QString& sFamily, uint32 uiSize, const QString& sPrefix)
 {
   CSignMap oSignMap = generateSignMap(sFamily, uiSize, sPrefix);
-  m_pUi->guiEditSources->appendPlainText(oSignMap.getSFontRectangleMap());
+  oSignMap.shrinkUpperAndLower();
+  m_pUi->guiEditSources->appendPlainText(oSignMap.getSFontRectangleMap(false));
 }
 
 void CcFontConverter::onFontClicked(bool bChecked)
@@ -241,9 +285,8 @@ QList<QString> CcFontConverter::getFonts()
   return oFonts;
 }
 
-void CcFontConverter::checkFonts()
+void CcFontConverter::addFont(const QString& sFont)
 {
-  QString sFont = m_oFont.family();
   QList<QString> oFonts = getFonts();
   if(!oFonts.contains(sFont))
   {
@@ -256,6 +299,12 @@ void CcFontConverter::checkFonts()
       m_pUi->guiEditFonts->setText(m_pUi->guiEditFonts->text() + ", " + sFont);
     }
   }
+}
+
+void CcFontConverter::checkFonts()
+{
+  QString sFont = m_oFont.family();
+  addFont(sFont);
 }
 
 QList<uint32> CcFontConverter::getSizes()

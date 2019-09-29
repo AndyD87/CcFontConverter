@@ -28,6 +28,8 @@ public:
     { return m_uiHeight; }
   uint32 getWidth() const
     { return m_uiWidth; }
+  uint32 getBytesWidth() const
+    { return getBytesFromWidth(m_uiWidth); }
 
   void cutRows(uint32 uiBegin, uint32 uiEnd);
   void cutColumns(uint32 uiBegin, uint32 uiEnd);

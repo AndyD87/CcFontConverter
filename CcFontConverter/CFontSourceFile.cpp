@@ -4,44 +4,57 @@
 const QByteArray CFontSourceFile::c_sGeneratorStart("// FontConverter start");
 const QByteArray CFontSourceFile::c_sGeneratorEnd("// FontConverter end");
 const QByteArray CFontSourceFile::c_sHeaderCommonData(
-"#pragma pack(push, 1)\n"
-"/**\n"
-" * @brief Structure for describing an filled rectangular.\n"
-" *        Containing data structure of row and columns is depending on it's width.\n"
-" *        For size of a row, SFontRectangle_GetArrayWidth can be used to get it width of row in bytes.\n"
-" */\n"
-"typedef struct\n"
-"{\n"
-"	unsigned char uiWidth;	//!< Width of rectangle\n"
-"	unsigned char uiHeight;	//!< Height of rectangle\n"
-"	unsigned char pData[1];	//!< Pix map with size SFontRectangle_GetArrayWidth(this) * uiHeight.\n"
-"} SFontRectangle;\n"
-"#pragma pack(pop)\n"
-"\n"
-"/**\n"
-" * @brief Get width of row in bytes\n"
-" * @param pRectangle: Get width of row in bytes from this rectangle\n"
-" * @return number of real width in bytes.\n"
-" */\n"
-"inline unsigned char SFontRectangle_GetArrayWidth(SFontRectangle* pRectangle)\n"
-"{\n"
-"	unsigned char uiValue=0;\n"
-"	uiValue = pRectangle->uiWidth / 8;\n"
-"	if((pRectangle->uiWidth % 8) != 0)\n"
-"	{\n"
-"		uiValue++;\n"
-"	}\n"
-"	return uiValue;\n"
-"}\n\n");
+  "#include <stdlib.h>\n"
+  "#pragma pack(push, 1)\n"
+  "/**\n"
+  " * @brief Structure for describing an filled rectangular.\n"
+  " *        Containing data structure of row and columns is depending on it's width.\n"
+  " *        For size of a row, SFontRectangle_GetArrayWidth can be used to get it width of row in bytes.\n"
+  " */\n"
+  "typedef struct\n"
+  "{\n"
+  "	unsigned char uiWidth;	//!< Width of rectangle\n"
+  "	unsigned char uiHeight;	//!< Height of rectangle\n"
+  "	unsigned char pData[1];	//!< Pix map with size SFontRectangle_GetArrayWidth(this) * uiHeight.\n"
+  "} SFontRectangle;\n"
+  "#pragma pack(pop)\n"
+  "\n"
+  "/**\n"
+  " * @brief Get width of row in bytes\n"
+  " * @param pRectangle: Get width of row in bytes from this rectangle\n"
+  " * @return number of real width in bytes.\n"
+  " */\n"
+  "inline unsigned char SFontRectangle_GetArrayWidth(SFontRectangle* pRectangle)\n"
+  "{\n"
+  "	unsigned char uiValue=0;\n"
+  "	uiValue = pRectangle->uiWidth / 8;\n"
+  "	if((pRectangle->uiWidth % 8) != 0)\n"
+  "	{\n"
+  "		uiValue++;\n"
+  "	}\n"
+  "	return uiValue;\n"
+  "}\n\n"
+);
 
-CFontSourceFile::CFontSourceFile()
-{
-
-}
+const QString CFontSourceFile::c_sSourceCommonData(
+  "#pragma pack(push, 1)\n"
+  "typedef struct\n"
+  "{\n"
+  "	unsigned char uiWidth;	//!< Width of rectangle\n"
+  "	unsigned char uiHeight;	//!< Height of rectangle\n"
+  "	unsigned char pData[%1];	//!< Pix map with size SFontRectangle_GetArrayWidth(this) * uiHeight.\n"
+  "} SFontRectangle_%1;\n"
+  "#pragma pack(pop)\n"
+  "\n"
+);
 
 bool CFontSourceFile::open()
 {
   bool bSuccess = false;
+  if(m_oSourceFile.fileName().endsWith("cpp"))
+    m_bCppMode = true;
+  else
+    m_bCppMode = false;
   if(m_oHeaderFile.open(QIODevice::ReadOnly))
   {
     qint64 uiHeaderGeneratorStart = 0;
@@ -129,11 +142,22 @@ void CFontSourceFile::writeFiles()
   QStringList oFileNameSplitted = m_oHeaderFile.fileName().split("/");
   QString sFileName = oFileNameSplitted.at(oFileNameSplitted.size()-1);
   QByteArray oInclude = QString("#include \"" + sFileName +"\"\n\n").toLatin1();
+  QList<int> oSizesList;
+  for(CSignMap& rSignMap : m_oSignMaps)
+  {
+    rSignMap.shrinkUpperAndLower();
+    rSignMap.updateRectangleSizes(oSizesList);
+  }
   m_oSourceFile.write(m_sSourceGeneratorStart);
+  for(int iSize : oSizesList)
+  {
+    QString sRectangle = generateSResource(iSize);
+    m_oSourceFile.write(sRectangle.toUtf8());
+  }
   m_oSourceFile.write(oInclude);
   for(CSignMap& rSignMap : m_oSignMaps)
   {
-    m_oSourceFile.write(rSignMap.getSFontRectangleMap().toUtf8());
+    m_oSourceFile.write(rSignMap.getSFontRectangleMap(m_bCppMode).toUtf8());
   }
   m_oSourceFile.write(m_sSourceGeneratorEnd);
 
@@ -150,4 +174,9 @@ void CFontSourceFile::close()
 {
   m_oSourceFile.close();
   m_oHeaderFile.close();
+}
+
+QString CFontSourceFile::generateSResource(int iSize)
+{
+  return c_sSourceCommonData.arg(QString::number(iSize));
 }

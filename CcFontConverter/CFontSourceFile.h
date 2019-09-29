@@ -9,7 +9,7 @@
 class CFontSourceFile
 {
 public:
-  CFontSourceFile();
+  CFontSourceFile() = default;
   void setHeaderFilePath(const QString& sPath)
    { m_oHeaderFile.setFileName(sPath); }
   void setSourceFilePath(const QString& sPath)
@@ -20,11 +20,14 @@ public:
   bool open();
   void writeFiles();
   void close();
+  void setCppMode(bool bCppMode)
+    { m_bCppMode = bCppMode; }
 private:
-
+  QString generateSResource(int iSize);
 private:
   QFile m_oSourceFile;
   QFile m_oHeaderFile;
+  bool m_bCppMode = false;
   QByteArray m_sSourceGeneratorStart;
   QByteArray m_sSourceGeneratorEnd;
   QByteArray m_sHeaderGeneratorStart;
@@ -34,6 +37,7 @@ private:
   static const QByteArray c_sGeneratorStart;
   static const QByteArray c_sGeneratorEnd;
   static const QByteArray c_sHeaderCommonData;
+  static const QString c_sSourceCommonData;
 };
 
 #endif // CFONTSOURCEFILE_H

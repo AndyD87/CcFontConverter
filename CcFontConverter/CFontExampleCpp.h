@@ -30,7 +30,7 @@ inline unsigned char SFontRectangle_GetArrayWidth(SFontRectangle* pRectangle)
 	return uiValue;
 }
 
-extern size_t BitstreamVeraSans_9_Size;
+extern size_t BitstreamVeraSans_12_Size;
 
 
 // FontConverter end
