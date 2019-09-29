@@ -5,6 +5,8 @@ const QByteArray CFontSourceFile::c_sGeneratorStart("// FontConverter start");
 const QByteArray CFontSourceFile::c_sGeneratorEnd("// FontConverter end");
 const QByteArray CFontSourceFile::c_sHeaderCommonData(
   "#include <stdlib.h>\n"
+  "#ifndef SFONTRECTANGLE_DEFINED\n"
+  "#define SFONTRECTANGLE_DEFINED //!< Avoid douple defintions\n"
   "#pragma pack(push, 1)\n"
   "/**\n"
   " * @brief Structure for describing an filled rectangular.\n"
@@ -33,7 +35,8 @@ const QByteArray CFontSourceFile::c_sHeaderCommonData(
   "		uiValue++;\n"
   "	}\n"
   "	return uiValue;\n"
-  "}\n\n"
+  "}\n"
+  "#endif // SFONTRECTANGLE_DEFINED\n\n"
 );
 
 const QString CFontSourceFile::c_sSourceCommonData(

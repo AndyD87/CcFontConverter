@@ -1,5 +1,7 @@
 // FontConverter start
 #include <stdlib.h>
+#ifndef SFONTRECTANGLE_DEFINED
+#define SFONTRECTANGLE_DEFINED //!< Avoid douple defintions
 #pragma pack(push, 1)
 /**
  * @brief Structure for describing an filled rectangular.
@@ -28,6 +30,7 @@ inline unsigned char SFontRectangle_GetArrayWidth(SFontRectangle* pRectangle)
 		uiValue++;
 	}
 	return uiValue;
+#endif // SFONTRECTANGLE_DEFINED
 }
 
 extern size_t BitstreamVeraSans_9_Size;
