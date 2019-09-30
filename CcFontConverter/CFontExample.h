@@ -30,8 +30,8 @@ inline unsigned char SFontRectangle_GetArrayWidth(SFontRectangle* pRectangle)
 		uiValue++;
 	}
 	return uiValue;
-#endif // SFONTRECTANGLE_DEFINED
 }
+#endif // SFONTRECTANGLE_DEFINED
 
 extern size_t BitstreamVeraSans_9_Size;
 

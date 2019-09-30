@@ -51,6 +51,17 @@ const QString CFontSourceFile::c_sSourceCommonData(
   "\n"
 );
 
+const QString CFontSourceFile::c_sSourceCommonData0(
+  "#pragma pack(push, 1)\n"
+  "typedef struct\n"
+  "{\n"
+  "	unsigned char uiWidth;	//!< Width of rectangle\n"
+  "	unsigned char uiHeight;	//!< Height of rectangle\n"
+  "} SFontRectangle_0;\n"
+  "#pragma pack(pop)\n"
+  "\n"
+);
+
 bool CFontSourceFile::open()
 {
   bool bSuccess = false;
@@ -152,12 +163,12 @@ void CFontSourceFile::writeFiles()
     rSignMap.updateRectangleSizes(oSizesList);
   }
   m_oSourceFile.write(m_sSourceGeneratorStart);
+  m_oSourceFile.write(oInclude);
   for(int iSize : oSizesList)
   {
     QString sRectangle = generateSResource(iSize);
     m_oSourceFile.write(sRectangle.toUtf8());
   }
-  m_oSourceFile.write(oInclude);
   for(CSignMap& rSignMap : m_oSignMaps)
   {
     m_oSourceFile.write(rSignMap.getSFontRectangleMap(m_bCppMode).toUtf8());
@@ -181,5 +192,8 @@ void CFontSourceFile::close()
 
 QString CFontSourceFile::generateSResource(int iSize)
 {
-  return c_sSourceCommonData.arg(QString::number(iSize));
+  if(iSize != 0)
+    return c_sSourceCommonData.arg(QString::number(iSize));
+  else
+    return c_sSourceCommonData0;
 }

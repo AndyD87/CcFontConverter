@@ -47,9 +47,10 @@ void CSign::init(uint32 uiId, uint32 uiWidth, uint32 uiHeight)
 
 QString CSign::getSFontRectangle() const
 {
-  QString sOutput = "{" + QString::number(m_uiWidth) + "," + QString::number(m_uiHeight) + ",{";
+  QString sOutput = "{" + QString::number(m_uiWidth) + "," + QString::number(m_uiHeight);
   if(m_uiWidth > 0)
   {
+    sOutput += ",{";
     for(size_t iY=0; iY<m_uiHeight; iY++)
     {
       uint8 uiCurrentByte = 0;
@@ -78,8 +79,9 @@ QString CSign::getSFontRectangle() const
         sOutput += ",";
       }
     }
+    sOutput += "}";
   }
-  sOutput += "}};";
+  sOutput += "};";
   return sOutput;
 }
 

@@ -38,6 +38,7 @@ private:
   static const QByteArray c_sGeneratorEnd;
   static const QByteArray c_sHeaderCommonData;
   static const QString c_sSourceCommonData;
+  static const QString c_sSourceCommonData0;
 };
 
 #endif // CFONTSOURCEFILE_H

@@ -1,5 +1,7 @@
 // This string should never be deleted!
 // FontConverter start
+#include "CFontExample.h"
+
 #pragma pack(push, 1)
 typedef struct
 {
@@ -14,7 +16,6 @@ typedef struct
 {
 	unsigned char uiWidth;	//!< Width of rectangle
 	unsigned char uiHeight;	//!< Height of rectangle
-	unsigned char pData[0];	//!< Pix map with size SFontRectangle_GetArrayWidth(this) * uiHeight.
 } SFontRectangle_0;
 #pragma pack(pop)
 
@@ -27,27 +28,25 @@ typedef struct
 } SFontRectangle_24;
 #pragma pack(pop)
 
-#include "CFontExample.h"
-
 SFontRectangle_12 BitstreamVeraSans_9_0 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
-SFontRectangle_0 BitstreamVeraSans_9_1 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_2 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_3 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_4 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_5 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_6 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_7 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_8 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_9 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_10 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_11 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_12 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_13 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_14 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_15 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_16 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_17 = {0,12,{}};
-SFontRectangle_0 BitstreamVeraSans_9_18 = {0,12,{}};
+SFontRectangle_0 BitstreamVeraSans_9_1 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_2 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_3 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_4 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_5 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_6 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_7 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_8 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_9 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_10 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_11 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_12 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_13 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_14 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_15 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_16 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_17 = {0,12};
+SFontRectangle_0 BitstreamVeraSans_9_18 = {0,12};
 SFontRectangle_12 BitstreamVeraSans_9_19 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
 SFontRectangle_12 BitstreamVeraSans_9_20 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
 SFontRectangle_12 BitstreamVeraSans_9_21 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
@@ -61,7 +60,7 @@ SFontRectangle_12 BitstreamVeraSans_9_28 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x
 SFontRectangle_12 BitstreamVeraSans_9_29 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
 SFontRectangle_12 BitstreamVeraSans_9_30 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
 SFontRectangle_12 BitstreamVeraSans_9_31 = {7,12,{0x0,0x0,0x7f,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63,0x63}};
-SFontRectangle_0 BitstreamVeraSans_9_32 = {0,12,{}};
+SFontRectangle_0 BitstreamVeraSans_9_32 = {0,12};
 SFontRectangle_12 BitstreamVeraSans_9_33 = {2,12,{0x0,0x0,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x0}};
 SFontRectangle_12 BitstreamVeraSans_9_34 = {4,12,{0x0,0x0,0xf,0xf,0xf,0xf,0x0,0x0,0x0,0x0,0x0,0x0}};
 SFontRectangle_24 BitstreamVeraSans_9_35 = {10,12,{0x0,0x0,0x0,0x0,0xf0,0x0,0xf8,0x0,0xd8,0x0,0xfe,0x3,0xf8,0x0,0xff,0x1,0x6c,0x0,0x6c,0x0,0x3c,0x0,0x0,0x0}};
@@ -124,7 +123,7 @@ SFontRectangle_12 BitstreamVeraSans_9_91 = {3,12,{0x0,0x7,0x3,0x3,0x3,0x3,0x3,0x
 SFontRectangle_12 BitstreamVeraSans_9_92 = {4,12,{0x0,0x0,0x3,0x3,0x3,0x7,0x6,0x6,0x6,0xc,0xc,0xc}};
 SFontRectangle_12 BitstreamVeraSans_9_93 = {3,12,{0x0,0x7,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x7}};
 SFontRectangle_12 BitstreamVeraSans_9_94 = {8,12,{0x0,0x18,0x3c,0x7e,0xe7,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
-SFontRectangle_0 BitstreamVeraSans_9_95 = {0,12,{}};
+SFontRectangle_0 BitstreamVeraSans_9_95 = {0,12};
 SFontRectangle_12 BitstreamVeraSans_9_96 = {3,12,{0x3,0x7,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
 SFontRectangle_12 BitstreamVeraSans_9_97 = {7,12,{0x0,0x0,0x0,0x0,0x3e,0x7e,0x60,0x7e,0x67,0x77,0x7e,0x0}};
 SFontRectangle_12 BitstreamVeraSans_9_98 = {6,12,{0x0,0x3,0x3,0x3,0x3f,0x3f,0x33,0x33,0x33,0x3f,0x3f,0x0}};
